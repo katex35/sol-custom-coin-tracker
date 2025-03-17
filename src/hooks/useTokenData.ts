@@ -1,82 +1,103 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getTokenInfo, getWalletTokenBalance } from '../services/solanaService';
 import { TokenData, WalletBalance } from '../types';
 
-// Kalıcı önbellek için geniş scope'lu bir değişken
-const staleTokenData: Record<string, TokenData> = {};
+// Stale token data to use during API rate limiting
+let staleTokenData: {[key: string]: TokenData} = {};
 
 // Wallet adreslerini al
 const WALLET_ADDRESSES = process.env.REACT_APP_WALLET_ADDRESSES?.split(',').filter(Boolean) || [];
 
-export function useTokenData(tokenMint: string) {
-  return useQuery<TokenData, Error>(['tokenData', tokenMint], async () => {
-    // Check if the tokenMint is in the stale list (to avoid refetching)
-    if (staleTokenData[tokenMint]) {
-      return staleTokenData[tokenMint];
-    }
-    
+export function useTokenData(token: string, wallets: string[], enabled = true) {
+  const queryFn = async (): Promise<TokenData> => {
+    console.log(`Fetching data for token: ${token}`);
+
     try {
-      // First, get the token info
-      const tokenInfo = await getTokenInfo(tokenMint);
-      
-      // Then, get balances across all wallets
-      const walletBalances: WalletBalance[] = [];
-      
-      // Process wallets in chunks to avoid rate limiting
-      const chunkSize = 5;
-      for (let i = 0; i < WALLET_ADDRESSES.length; i += chunkSize) {
-        const chunk = WALLET_ADDRESSES.slice(i, i + chunkSize);
+      // Try to get token information
+      const tokenInfo = await getTokenInfo(token);
+      let walletBalances: WalletBalance[] = [];
+
+      // Process wallet balances in chunks to avoid rate limiting
+      const chunkSize = 3;
+      for (let i = 0; i < wallets.length; i += chunkSize) {
+        const chunk = wallets.slice(i, i + chunkSize);
         
-        // Add delay between chunks
-        if (i > 0) {
-          await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between chunks
-        }
-        
-        await Promise.all(chunk.map(async (address) => {
+        const chunkPromises = chunk.map(async (wallet) => {
           try {
-            const balance = await getWalletTokenBalance(address, tokenMint);
-            
-            if (balance.balance > 0) {
-              walletBalances.push({
-                ...balance,
-                value: balance.balance * tokenInfo.price
-              });
+            const balance = await getWalletTokenBalance(wallet, token);
+            if (balance && balance.balance > 0) {
+              return {
+                address: wallet,
+                tokenMint: token,
+                balance: balance.balance,
+                value: balance.balance * (tokenInfo.price || 0)
+              } as WalletBalance;
             }
+            return null;
           } catch (error) {
-            // Silent fail for individual wallet errors
+            console.error(`Failed to get balance for wallet ${wallet}:`, error);
+            return null;
           }
-        }));
+        });
+        
+        const chunkResults = await Promise.all(chunkPromises);
+        walletBalances = [...walletBalances, ...chunkResults.filter(Boolean) as WalletBalance[]];
+        
+        // Add a delay between chunks to avoid rate limiting
+        if (i + chunkSize < wallets.length) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
-      
+
       // Calculate total value
-      const totalValue = walletBalances.reduce((sum, wallet) => {
-        return sum + wallet.value;
-      }, 0);
-      
-      // Create the final result
-      const result: TokenData = {
+      const totalValue = walletBalances.reduce((sum, balance) => sum + balance.value, 0);
+
+      const tokenData: TokenData = {
+        tokenMint: token,
         info: tokenInfo,
         walletBalances,
-        totalValue,
-        tokenMint
+        totalValue
+      };
+
+      // Save as stale data for future use if API gets rate limited
+      staleTokenData[token] = tokenData;
+
+      return tokenData;
+    } catch (error) {
+      console.error(`Error fetching token data for ${token}:`, error);
+      
+      // If we have stale data for this token, use it instead of failing
+      if (staleTokenData[token]) {
+        console.log(`Using stale data for token ${token} due to API error`);
+        return staleTokenData[token];
+      }
+      
+      // Implement retry logic with proper typing
+      const retryFetch = async (attempt: number, maxAttempts = 3, delay = 2000): Promise<TokenData> => {
+        if (attempt >= maxAttempts) throw error;
+        
+        console.log(`Retry attempt ${attempt + 1} for token ${token}`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        try {
+          return await queryFn();
+        } catch (retryError) {
+          return retryFetch(attempt + 1, maxAttempts, delay * 1.5);
+        }
       };
       
-      // Cache the result for next time
-      staleTokenData[tokenMint] = result;
-      
-      return result;
-    } catch (error) {
-      // Re-throw the error to be handled by React Query
-      throw error;
+      return retryFetch(0);
     }
-  }, {
-    staleTime: 60000, // 1 minute - data considered fresh for longer
-    retry: 3,         // Retry 3 times instead of 2
-    retryDelay: attempt => Math.min(1000 * Math.pow(2, attempt), 30000), // Exponential backoff
-    refetchInterval: 60000, // Auto refetch less frequently - every 60 seconds
-    refetchOnWindowFocus: false, // Disable refetch on window focus
-    onError: (error) => {
-      console.error(`Error fetching data for ${tokenMint}:`, error);
-    }
+  };
+
+  return useQuery({
+    queryKey: ['tokenData', token],
+    queryFn,
+    enabled: enabled,
+    staleTime: 60000, // 60 seconds
+    gcTime: 300000, // 5 minutes (formerly cacheTime)
+    retry: 3,
+    refetchInterval: 60000, // 60 seconds
+    refetchOnWindowFocus: false,
   });
 } 

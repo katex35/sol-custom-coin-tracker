@@ -39,7 +39,11 @@ import {
   useBreakpointValue,
   Tag,
 } from '@chakra-ui/react';
-import { QueryClient, QueryClientProvider, useQueryClient } from 'react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient
+} from '@tanstack/react-query';
 import { TokenCard } from './components/TokenCard';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { useTokenData } from './hooks/useTokenData';
@@ -149,7 +153,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       retry: 1,
       staleTime: 60000, // 1 minute
-      cacheTime: 300000, // 5 minutes
+      gcTime: 300000, // 5 minutes (replaces cacheTime in Tanstack Query v4+)
     },
   },
 });
@@ -458,7 +462,7 @@ function AppContent() {
       
       // Invalidate and refetch queries for all tracked tokens
       const refreshPromises = trackedTokens.map(token => 
-        queryClient.invalidateQueries(['tokenData', token])
+        queryClient.invalidateQueries({queryKey: ['tokenData', token]})
       );
       
       await Promise.all(refreshPromises);
@@ -608,7 +612,7 @@ function AppContent() {
                   exit={{ opacity: 0, scale: 0.9 }}
                   style={{ opacity: 1 }}
                 >
-                  <TokenDisplay tokenMint={token} />
+                  <TokenContainer tokenMint={token} />
                 </MotionBox>
               ))}
             </AnimatePresence>
@@ -671,8 +675,12 @@ function AppContent() {
 }
 
 // Component to load and display data for tokens with loading state
-function TokenDisplay({ tokenMint }: { tokenMint: string }) {
-  const { data, isLoading, error } = useTokenData(tokenMint);
+function TokenContainer({ tokenMint }: { tokenMint: string }) {
+  const [WALLET_ADDRESSES] = useState(() => 
+    process.env.REACT_APP_WALLET_ADDRESSES?.split(',').filter(Boolean) || []
+  );
+  
+  const { data, isLoading, isError, error } = useTokenData(tokenMint, WALLET_ADDRESSES, true);
 
   if (isLoading) {
     return (
@@ -701,7 +709,7 @@ function TokenDisplay({ tokenMint }: { tokenMint: string }) {
     );
   }
   
-  if (error || !data) {
+  if (isError || !data) {
     return (
       <Box 
         borderWidth="1px" 
