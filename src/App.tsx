@@ -14,7 +14,6 @@ import {
   GridItem,
   Skeleton,
   extendTheme,
-  keyframes,
   IconButton,
   Tooltip,
   Drawer,
@@ -49,6 +48,7 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 import { useTokenData } from './hooks/useTokenData';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { RepeatIcon, AddIcon, SearchIcon, CloseIcon, ChevronDownIcon, StarIcon } from '@chakra-ui/icons';
+import { keyframes } from '@emotion/react';
 
 // Create animations
 const fadeIn = keyframes`
