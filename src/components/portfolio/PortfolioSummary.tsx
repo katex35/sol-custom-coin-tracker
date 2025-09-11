@@ -28,7 +28,7 @@ export const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
   portfolioData,
   tokensCount,
 }) => {
-  const { isRefreshing, portfolioUpdateTrigger } = useTokenContext();
+  const { isRefreshing } = useTokenContext();
   const { totalValue, sellSimulationValue } = portfolioData;
   const difference = sellSimulationValue - totalValue;
   const percentageChange = totalValue > 0 ? (difference / totalValue) * 100 : 0;

@@ -15,7 +15,6 @@ import {
   StatArrow,
   useToast,
   Divider,
-  Badge,
 } from '@chakra-ui/react';
 import {
   Chart as ChartJS,

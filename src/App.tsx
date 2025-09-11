@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChakraProvider, Container, Box, useToast, useDisclosure } from '@chakra-ui/react';
+import { ChakraProvider, Box, useToast, useDisclosure } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import theme from './theme';
 import { TokenProvider, useTokenContext } from './contexts/TokenContext';
@@ -33,7 +33,6 @@ const AppContent: React.FC = () => {
     refreshAllTokens,
     isRefreshing,
     getTotalPortfolioValue,
-    portfolioUpdateTrigger,
   } = useTokenContext();
 
   const handleSubmit = () => {

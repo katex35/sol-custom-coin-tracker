@@ -6,7 +6,6 @@ import {
   Badge,
   Collapse,
   IconButton,
-  Button,
   VStack,
 } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
@@ -36,9 +35,6 @@ export const TokenCard: React.FC<TokenCardProps> = ({ data }) => {
     totalBalance,
     !isUSDC && totalBalance > 0
   );
-
-  const visibleWallets = showAllWallets ? walletBalances : walletBalances.slice(0, 3);
-  const hiddenWalletsCount = walletBalances.length - 3;
 
   return (
     <Box
