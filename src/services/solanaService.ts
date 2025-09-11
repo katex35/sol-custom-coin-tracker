@@ -98,4 +98,27 @@ export const getWalletTokenBalance = async (
       value: 0,
     };
   }
+};
+
+export const getWalletSolBalance = async (walletAddress: string): Promise<WalletBalance> => {
+  try {
+    const walletPubkey = new PublicKey(walletAddress);
+    const balance = await connection.getBalance(walletPubkey);
+    const solBalance = balance / 1e9; // Convert lamports to SOL
+    
+    return {
+      address: walletAddress,
+      tokenMint: 'So11111111111111111111111111111111111111112', // SOL mint address
+      balance: solBalance,
+      value: 0, // Will be calculated later with price
+    };
+  } catch (error) {
+    console.error('Error fetching SOL balance:', error);
+    return {
+      address: walletAddress,
+      tokenMint: 'So11111111111111111111111111111111111111112',
+      balance: 0,
+      value: 0,
+    };
+  }
 }; 
