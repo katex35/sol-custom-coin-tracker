@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTokenData } from '../../hooks/useTokenData';
 import { TokenCard } from '../TokenCard';
-import { TokenSkeleton } from './TokenSkeleton';
+import { LoadingSpinner } from '../LoadingSpinner';
 import { 
   Alert, 
   AlertIcon
@@ -19,7 +19,7 @@ export const TokenContainer: React.FC<TokenContainerProps> = ({
   const { data, isLoading, error } = useTokenData(tokenMint, wallets);
 
   if (isLoading) {
-    return <TokenSkeleton />;
+    return <LoadingSpinner message="Loading token..." size="md" />;
   }
 
   if (error) {

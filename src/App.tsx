@@ -7,6 +7,7 @@ import { Header } from './components/layout/Header';
 import { PortfolioSummary } from './components/portfolio/PortfolioSummary';
 import { TokenGrid } from './components/tokens/TokenGrid';
 import { AddTokenDrawer } from './components/tokens/AddTokenDrawer';
+import { AnalyticsDashboard } from './components/analytics/AnalyticsDashboard';
 
 // Configure the query client
 const queryClient = new QueryClient({
@@ -32,6 +33,7 @@ const AppContent: React.FC = () => {
     refreshAllTokens,
     isRefreshing,
     getTotalPortfolioValue,
+    portfolioUpdateTrigger,
   } = useTokenContext();
 
   const handleSubmit = () => {
@@ -92,7 +94,7 @@ const AppContent: React.FC = () => {
 
   return (
     <Box minH="100vh" bg="gray.50">
-      <Box maxW="100%" px={6} py={6}>
+      <Box maxW="100%" px={{ base: 4, md: 6 }} py={{ base: 4, md: 6 }}>
         <Header
           trackedTokensCount={trackedTokens.length}
           isRefreshing={isRefreshing}
@@ -100,9 +102,18 @@ const AppContent: React.FC = () => {
           onAddToken={onOpen}
         />
         
-        <Box display="flex" gap={6} mt={6} maxW="100%">
+        <Box 
+          display="flex" 
+          flexDirection={{ base: "column", lg: "row" }}
+          gap={{ base: 4, md: 6 }} 
+          mt={{ base: 4, md: 6 }} 
+          maxW="100%"
+        >
           {/* Left Column - Portfolio Summary */}
-          <Box flex="0 0 500px">
+          <Box 
+            flex={{ base: "none", lg: "0 0 400px", xl: "0 0 500px" }}
+            order={{ base: 2, lg: 1 }}
+          >
             {trackedTokens.length > 0 && (
               <PortfolioSummary
                 portfolioData={getTotalPortfolioValue()}
@@ -112,9 +123,20 @@ const AppContent: React.FC = () => {
           </Box>
           
           {/* Right Column - Token Grid */}
-          <Box flex="1" minW="0">
+          <Box 
+            flex="1" 
+            minW="0"
+            order={{ base: 1, lg: 2 }}
+          >
             <TokenGrid tokens={trackedTokens} onAddToken={onOpen} />
           </Box>
+        </Box>
+        
+        {/* Analytics Dashboard */}
+        <Box mt={{ base: 4, md: 6 }}>
+          <AnalyticsDashboard 
+            currentPortfolioData={getTotalPortfolioValue()}
+          />
         </Box>
         
         <AddTokenDrawer

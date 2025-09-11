@@ -6,9 +6,12 @@ interface TokenContextType {
   trackedTokens: string[];
   addToken: (tokenMint: string) => void;
   removeToken: (tokenMint: string) => void;
-  refreshAllTokens: () => Promise<void>;
+  clearAllTokens: () => void;
+  refreshAllTokens: () => void;
   isRefreshing: boolean;
-  getTotalPortfolioValue: () => { totalValue: number; sellSimulationValue: number };
+  portfolioUpdateTrigger: number;
+  triggerPortfolioUpdate: () => void;
+  getTotalPortfolioValue: () => { totalValue: number; totalTokens: number; sellSimulationValue: number };
 }
 
 const TokenContext = createContext<TokenContextType | undefined>(undefined);
@@ -26,6 +29,7 @@ const DEFAULT_TOKENS = [
 export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
   const [trackedTokens, setTrackedTokens] = useState<string[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [portfolioUpdateTrigger, setPortfolioUpdateTrigger] = useState(0);
   const queryClient = useQueryClient();
 
   // Load default tokens on mount
@@ -35,6 +39,15 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
     }
   }, [trackedTokens.length]);
 
+  // Trigger portfolio update when query cache changes
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+      setPortfolioUpdateTrigger(prev => prev + 1);
+    });
+
+    return () => unsubscribe();
+  }, [queryClient]);
+
   const addToken = (tokenMint: string) => {
     if (!trackedTokens.includes(tokenMint)) {
       setTrackedTokens(prev => [...prev, tokenMint]);
@@ -43,6 +56,14 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
 
   const removeToken = (tokenMint: string) => {
     setTrackedTokens(prev => prev.filter(token => token !== tokenMint));
+  };
+
+  const clearAllTokens = () => {
+    setTrackedTokens([]);
+  };
+
+  const triggerPortfolioUpdate = () => {
+    setPortfolioUpdateTrigger(prev => prev + 1);
   };
 
   const refreshAllTokens = async () => {
@@ -59,9 +80,10 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
     }
   };
 
-  const getTotalPortfolioValue = (): { totalValue: number; sellSimulationValue: number } => {
+  const getTotalPortfolioValue = (): { totalValue: number; totalTokens: number; sellSimulationValue: number } => {
     let totalValue = 0;
     let sellSimulationValue = 0;
+    const totalTokens = trackedTokens.length;
     
     trackedTokens.forEach(tokenMint => {
       const cachedData = queryClient.getQueryData<TokenData>(['tokenData', tokenMint]);
@@ -85,15 +107,18 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
       }
     });
     
-    return { totalValue, sellSimulationValue };
+    return { totalValue, totalTokens, sellSimulationValue };
   };
 
   const value: TokenContextType = {
     trackedTokens,
     addToken,
     removeToken,
+    clearAllTokens,
     refreshAllTokens,
     isRefreshing,
+    portfolioUpdateTrigger,
+    triggerPortfolioUpdate,
     getTotalPortfolioValue,
   };
 

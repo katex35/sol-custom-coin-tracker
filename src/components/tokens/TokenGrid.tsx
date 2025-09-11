@@ -26,16 +26,16 @@ export const TokenGrid: React.FC<TokenGridProps> = ({ tokens, onAddToken }) => {
     return (
       <Box
         bg="white"
-        p={12}
-        borderRadius="lg"
+        p={{ base: 8, md: 12 }}
+        borderRadius={{ base: "lg", md: "lg" }}
         borderWidth="1px"
         borderColor="gray.200"
         textAlign="center"
         boxShadow="sm"
       >
-        <VStack spacing={6}>
+        <VStack spacing={{ base: 4, md: 6 }}>
           <Box>
-            <Text color="gray.600" fontSize="lg" mb={2}>
+            <Text color="gray.600" fontSize={{ base: "md", md: "lg" }} mb={2}>
               No tokens tracked yet
             </Text>
             <Text color="gray.500" fontSize="sm">
@@ -46,7 +46,7 @@ export const TokenGrid: React.FC<TokenGridProps> = ({ tokens, onAddToken }) => {
             leftIcon={<AddIcon />} 
             onClick={onAddToken} 
             variant="solid"
-            size="lg"
+            size={{ base: "md", md: "lg" }}
           >
             Add your first token
           </Button>
@@ -59,11 +59,12 @@ export const TokenGrid: React.FC<TokenGridProps> = ({ tokens, onAddToken }) => {
     return (
       <Box
         bg="white"
-        borderRadius="lg"
+        borderRadius={{ base: "lg", md: "lg" }}
         borderWidth="1px"
         borderColor="gray.200"
         boxShadow="sm"
-        minH="400px"
+        minH={{ base: "300px", md: "400px" }}
+        p={{ base: 4, md: 6 }}
       >
         <LoadingSpinner message="Loading token data..." size="lg" />
       </Box>
@@ -71,7 +72,7 @@ export const TokenGrid: React.FC<TokenGridProps> = ({ tokens, onAddToken }) => {
   }
 
   return (
-    <VStack spacing={4} align="stretch">
+    <VStack spacing={{ base: 3, md: 4 }} align="stretch">
       {tokens.map((tokenMint) => (
         <TokenContainer key={tokenMint} tokenMint={tokenMint} wallets={WALLET_ADDRESSES} />
       ))}

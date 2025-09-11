@@ -28,7 +28,7 @@ export const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
   portfolioData,
   tokensCount,
 }) => {
-  const { isRefreshing } = useTokenContext();
+  const { isRefreshing, portfolioUpdateTrigger } = useTokenContext();
   const { totalValue, sellSimulationValue } = portfolioData;
   const difference = sellSimulationValue - totalValue;
   const percentageChange = totalValue > 0 ? (difference / totalValue) * 100 : 0;
@@ -56,17 +56,18 @@ export const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
   return (
     <Box
       bg="white"
-      p={6}
-      borderRadius="xl"
+      p={{ base: 4, md: 6 }}
+      borderRadius={{ base: "lg", md: "xl" }}
       borderWidth="1px"
       borderColor="gray.200"
       boxShadow="sm"
-      position="sticky"
+      position={{ base: "static", lg: "sticky" }}
       top={6}
+      mb={{ base: 4, lg: 0 }}
     >
-      <VStack spacing={6} align="stretch">
+      <VStack spacing={{ base: 4, md: 6 }} align="stretch">
         <Box>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800" mb={2}>
+          <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="gray.800" mb={2}>
             Portfolio Overview
           </Text>
           <Text fontSize="sm" color="gray.600">
@@ -77,10 +78,10 @@ export const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
         <Divider />
 
         {/* Portfolio Values */}
-        <SimpleGrid columns={1} spacing={4}>
+        <SimpleGrid columns={1} spacing={{ base: 3, md: 4 }}>
           <Stat>
             <StatLabel color="gray.600">Total Portfolio Value</StatLabel>
-            <StatNumber fontSize="2xl" color="gray.900">
+            <StatNumber fontSize={{ base: "xl", md: "2xl" }} color="gray.900">
               {formatCurrency(totalValue)}
             </StatNumber>
             <StatHelpText color="gray.500">
@@ -90,13 +91,13 @@ export const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
           
           <Stat>
             <StatLabel color="gray.600">Sell Simulation Value</StatLabel>
-            <StatNumber fontSize="xl" color={isPositive ? "green.600" : "red.600"}>
+            <StatNumber fontSize={{ base: "lg", md: "xl" }} color={isPositive ? "green.700" : "red.700"}>
               {formatCurrency(sellSimulationValue)}
             </StatNumber>
-            <StatHelpText color={isPositive ? "green.500" : "red.500"}>
+            <StatHelpText color={isPositive ? "green.700" : "red.700"}>
               <HStack spacing={1}>
                 <Icon as={isPositive ? TriangleUpIcon : TriangleDownIcon} />
-                <Text>
+                <Text fontSize={{ base: "sm", md: "md" }}>
                   {isPositive ? "+" : ""}{formatCurrency(difference)} ({percentageChange.toFixed(2)}%)
                 </Text>
               </HStack>
@@ -110,7 +111,7 @@ export const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
         <Box>
           <HStack justify="space-between" mb={2}>
             <Text fontSize="sm" color="gray.600">Portfolio Performance</Text>
-            <Badge colorScheme={isPositive ? "green" : "red"} variant="subtle">
+            <Badge colorScheme={isPositive ? "green" : "red"} variant="solid">
               {isPositive ? "Profitable" : "Loss"}
             </Badge>
           </HStack>

@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "api/save-portfolio.js": {
+      "maxDuration": 10
+    },
+    "api/portfolio-history.js": {
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "REACT_APP_SUPABASE_URL": "https://olpusotdbzarpahkahfc.supabase.co",
+    "REACT_APP_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9scHVzb3RkYnphcnBhaGthaGZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc1OTQ1ODUsImV4cCI6MjA3MzE3MDU4NX0.I6a9EQ1HikqZiwNoPqUkJH8O_ZjWTmEiGZsHa_82tn4"
+  }
+}

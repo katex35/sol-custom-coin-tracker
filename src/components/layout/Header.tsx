@@ -6,6 +6,8 @@ import {
   IconButton,
   Button,
   Tooltip,
+  Show,
+  Hide,
 } from '@chakra-ui/react';
 import { RepeatIcon, AddIcon } from '@chakra-ui/icons';
 
@@ -26,21 +28,25 @@ export const Header: React.FC<HeaderProps> = ({
     <Flex 
       align="center" 
       justify="space-between" 
-      py={6} 
-      mb={8}
+      py={{ base: 4, md: 6 }} 
+      mb={{ base: 4, md: 8 }}
       borderBottom="1px"
       borderColor="gray.200"
+      flexWrap="wrap"
+      gap={{ base: 3, md: 0 }}
     >
       <Heading 
-        size="lg" 
+        size={{ base: "md", md: "lg" }}
         fontWeight="bold"
         color="gray.900"
         letterSpacing="tight"
+        flex="1"
+        minW="fit-content"
       >
         Solana Token Tracker
       </Heading>
       
-      <HStack spacing={3}>
+      <HStack spacing={{ base: 2, md: 3 }} flexShrink={0}>
         {trackedTokensCount > 0 && (
           <Tooltip label="Refresh all data">
             <IconButton
@@ -48,8 +54,8 @@ export const Header: React.FC<HeaderProps> = ({
               icon={<RepeatIcon />}
               isLoading={isRefreshing}
               onClick={onRefresh}
+              size={{ base: "sm", md: "md" }}
               variant="ghost"
-              size="md"
             />
           </Tooltip>
         )}
@@ -57,9 +63,10 @@ export const Header: React.FC<HeaderProps> = ({
           leftIcon={<AddIcon />} 
           onClick={onAddToken}
           variant="solid"
-          size="md"
+          size={{ base: "sm", md: "md" }}
         >
-          Add Token
+          <Show above="sm">Add Token</Show>
+          <Hide above="sm">Add</Hide>
         </Button>
       </HStack>
     </Flex>
