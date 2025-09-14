@@ -13,6 +13,7 @@ import {
   SimpleGrid,
   Badge,
   Icon,
+  Image,
 } from '@chakra-ui/react';
 import { TriangleUpIcon, TriangleDownIcon } from '@chakra-ui/icons';
 import { formatCurrency } from '../../utils/formatters';
@@ -67,9 +68,23 @@ export const PortfolioSummary: React.FC<PortfolioSummaryProps> = ({
     >
       <VStack spacing={{ base: 4, md: 6 }} align="stretch">
         <Box>
-          <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="gray.800" mb={2}>
-            Portfolio Overview
-          </Text>
+          <HStack spacing={2} mb={2}>
+            <Image 
+              src="/favicon-16x16.png" 
+              alt="Portfolio Logo"
+              boxSize="18px"
+              fallback={
+                <Box 
+                  boxSize="18px" 
+                  bg="blue.500" 
+                  borderRadius="sm"
+                />
+              }
+            />
+            <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="gray.800">
+              Portfolio Overview
+            </Text>
+          </HStack>
           <Text fontSize="sm" color="gray.600">
             Real-time portfolio tracking with analytics
           </Text>

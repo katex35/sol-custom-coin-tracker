@@ -8,6 +8,8 @@ import {
   Tooltip,
   Show,
   Hide,
+  Image,
+  Box,
 } from '@chakra-ui/react';
 import { RepeatIcon, AddIcon } from '@chakra-ui/icons';
 
@@ -35,16 +37,32 @@ export const Header: React.FC<HeaderProps> = ({
       flexWrap="wrap"
       gap={{ base: 3, md: 0 }}
     >
-      <Heading 
-        size={{ base: "md", md: "lg" }}
-        fontWeight="bold"
-        color="gray.900"
-        letterSpacing="tight"
-        flex="1"
-        minW="fit-content"
-      >
-        Solana Token Tracker
-      </Heading>
+      <HStack spacing={{ base: 2, md: 3 }} flex="1" minW="fit-content">
+        <Box>
+          <Image 
+            src="/favicon-32x32.png" 
+            alt="Solana Token Tracker Logo"
+            boxSize={{ base: "24px", md: "32px" }}
+            fallback={
+              <Box 
+                boxSize={{ base: "24px", md: "32px" }} 
+                bg="blue.500" 
+                borderRadius="md"
+              />
+            }
+          />
+        </Box>
+        <Heading 
+          size={{ base: "md", md: "lg" }}
+          fontWeight="bold"
+          color="gray.900"
+          letterSpacing="tight"
+          whiteSpace="nowrap"
+        >
+          <Show above="sm">Solana Token Tracker</Show>
+          <Hide above="sm">SOL Tracker</Hide>
+        </Heading>
+      </HStack>
       
       <HStack spacing={{ base: 2, md: 3 }} flexShrink={0}>
         {trackedTokensCount > 0 && (

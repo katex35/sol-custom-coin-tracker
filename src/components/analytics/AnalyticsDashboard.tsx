@@ -15,6 +15,7 @@ import {
   StatArrow,
   useToast,
   Divider,
+  Image,
 } from '@chakra-ui/react';
 import {
   Chart as ChartJS,
@@ -361,14 +362,26 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           flexWrap={{ base: "wrap", md: "nowrap" }}
           spacing={{ base: 2, md: 3 }}
         >
-          <Heading 
-            size={{ base: "md", md: "lg" }} 
-            color="gray.800"
-            flex={{ base: "1 1 100%", md: "0 0 auto" }}
-            mb={{ base: 2, md: 0 }}
-          >
-            Portfolio Analytics
-          </Heading>
+          <HStack spacing={{ base: 2, md: 3 }} flex={{ base: "1 1 100%", md: "0 0 auto" }} mb={{ base: 2, md: 0 }}>
+            <Image 
+              src="/favicon-16x16.png" 
+              alt="Analytics Logo"
+              boxSize="20px"
+              fallback={
+                <Box 
+                  boxSize="20px" 
+                  bg="blue.500" 
+                  borderRadius="sm"
+                />
+              }
+            />
+            <Heading 
+              size={{ base: "md", md: "lg" }} 
+              color="gray.800"
+            >
+              Portfolio Analytics
+            </Heading>
+          </HStack>
           <HStack 
             spacing={{ base: 2, md: 3 }} 
             flexWrap={{ base: "wrap", sm: "nowrap" }}
